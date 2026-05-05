@@ -1,15 +1,15 @@
 /* ===================================================
-   app.js â€” ط¨ظˆط§ط¨ط© ظ†طھط§ط¦ط¬ ط§ظ„ط·ظ„ط¨ط© (ظ…ط¹ Firebase)
+   app.js — بوابة نتائج الطلبة (مع Firebase)
    =================================================== */
 
-/* -------- ط¥ط¹ط¯ط§ط¯ط§طھ Firebase -------- */
+/* -------- إعدادات Firebase -------- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, addDoc, getDocs,
   updateDoc, deleteDoc, doc, query, where
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// â¬‡ï¸ڈ ط¶ط¹ ظ‡ظ†ط§ ط¥ط¹ط¯ط§ط¯ط§طھ ظ…ط´ط±ظˆط¹ظƒ ظ…ظ† Firebase Console
+// ⬇️ ضع هنا إعدادات مشروعك من Firebase Console
 const firebaseConfig = {
   apiKey:            "AIzaSyCOroJ-c4WMseSVYAjniCkqT9tvbFxFCwk",
   authDomain:        "ameerabdi07hz.firebaseapp.com",
@@ -22,17 +22,17 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
-const COL = "students"; // ط§ط³ظ… ط§ظ„ظ…ط¬ظ…ظˆط¹ط© ظپظٹ Firestore
+const COL = "students"; // اسم المجموعة في Firestore
 
-/* -------- ط¨ظٹط§ظ†ط§طھ ط§ظ„ط£ط³طھط§ط° -------- */
+/* -------- بيانات الأستاذ -------- */
 const TEACHER_USER = "abdo";
 const TEACHER_PASS = "hz5758";
 
-/* -------- ظ…ط®ط²ظ† ظ…ط­ظ„ظٹ ظ…ط¤ظ‚طھ (ظٹظڈظ…ظ„ط£ ظ…ظ† Firebase) -------- */
+/* -------- مخزن محلي مؤقت (يُملأ من Firebase) -------- */
 let students = [];
 
 /* ===================================================
-   ظ…ط³ط§ط¹ط¯ط§طھ ط§ظ„طھظ‚ط¯ظٹط±
+   مساعدات التقدير
    =================================================== */
 function getGrade(score) {
   if (score >= 90) return "A";
@@ -41,11 +41,11 @@ function getGrade(score) {
   return "F";
 }
 function getGradeLabel(g) {
-  return { A: "ظ…ظ…طھط§ط²", B: "ط¬ظٹط¯ ط¬ط¯ط§ظ‹", C: "ط¬ظٹط¯", F: "ط±ط§ط³ط¨" }[g];
+  return { A: "ممتاز", B: "جيد جداً", C: "جيد", F: "راسب" }[g];
 }
 
 /* ===================================================
-   ط¬ظ„ط¨ ط§ظ„ط¨ظٹط§ظ†ط§طھ ظ…ظ† Firebase
+   جلب البيانات من Firebase
    =================================================== */
 async function loadStudents() {
   showLoading(true);
@@ -53,8 +53,8 @@ async function loadStudents() {
     const snap = await getDocs(collection(db, COL));
     students = snap.docs.map(d => ({ _docId: d.id, ...d.data() }));
   } catch (e) {
-    console.error("ط®ط·ط£ ظپظٹ ط¬ظ„ط¨ ط§ظ„ط¨ظٹط§ظ†ط§طھ:", e);
-    alert("âڑ ï¸ڈ طھط¹ط°ظ‘ط± ط§ظ„ط§طھطµط§ظ„ ط¨ظ‚ط§ط¹ط¯ط© ط§ظ„ط¨ظٹط§ظ†ط§طھ. طھط£ظƒط¯ ظ…ظ† ط¥ط¹ط¯ط§ط¯ط§طھ Firebase.");
+    console.error("خطأ في جلب البيانات:", e);
+    alert("⚠️ تعذّر الاتصال بقاعدة البيانات. تأكد من إعدادات Firebase.");
   }
   showLoading(false);
 }
@@ -68,14 +68,14 @@ function showLoading(on) {
       "position:fixed;inset:0;background:#0f172acc;display:flex;" +
       "align-items:center;justify-content:center;z-index:9999;" +
       "font-size:1.3rem;color:#60a5fa;font-family:'Tajawal',sans-serif;";
-    el.textContent = "âڈ³ ط¬ط§ط±ظچ ط§ظ„طھط­ظ…ظٹظ„...";
+    el.textContent = "⏳ جارٍ التحميل...";
     document.body.appendChild(el);
   }
   el.style.display = on ? "flex" : "none";
 }
 
 /* ===================================================
-   ط§ظ„طھظ†ظ‚ظ„ ط¨ظٹظ† ط§ظ„ط´ط§ط´ط§طھ
+   التنقل بين الشاشات
    =================================================== */
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s => {
@@ -92,7 +92,7 @@ function showScreen(id) {
 }
 
 /* ===================================================
-   ط¯ط®ظˆظ„ ط§ظ„ط£ط³طھط§ط°
+   دخول الأستاذ
    =================================================== */
 async function teacherLogin() {
   const user = document.getElementById("t-user").value.trim();
@@ -107,12 +107,12 @@ async function teacherLogin() {
     renderStats();
     renderTable();
   } else {
-    err.textContent = "âڑ ï¸ڈ ط§ط³ظ… ط§ظ„ظ…ط³طھط®ط¯ظ… ط£ظˆ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± طµط­ظٹط­ط©";
+    err.textContent = "⚠️ اسم المستخدم أو كلمة المرور غير صحيحة";
   }
 }
 
 /* ===================================================
-   ط¯ط®ظˆظ„ ط§ظ„ط·ط§ظ„ط¨
+   دخول الطالب
    =================================================== */
 async function studentLogin() {
   const sid = document.getElementById("s-id").value.trim();
@@ -123,7 +123,7 @@ async function studentLogin() {
     const snap = await getDocs(q);
     showLoading(false);
     if (snap.empty) {
-      err.textContent = "âڑ ï¸ڈ ط±ظ‚ظ… ط§ظ„ظ‚ظٹط¯ ط؛ظٹط± ظ…ظˆط¬ظˆط¯طŒ ظٹط±ط¬ظ‰ ط§ظ„طھط­ظ‚ظ‚.";
+      err.textContent = "⚠️ رقم القيد غير موجود، يرجى التحقق.";
       return;
     }
     err.textContent = "";
@@ -131,7 +131,7 @@ async function studentLogin() {
     showStudentResult(results);
   } catch (e) {
     showLoading(false);
-    err.textContent = "âڑ ï¸ڈ طھط¹ط°ظ‘ط± ط§ظ„ط§طھطµط§ظ„ ط¨ظ‚ط§ط¹ط¯ط© ط§ظ„ط¨ظٹط§ظ†ط§طھ.";
+    err.textContent = "⚠️ تعذّر الاتصال بقاعدة البيانات.";
     console.error(e);
   }
 }
@@ -141,17 +141,17 @@ function showStudentResult(results) {
   const initials = student.name.split(" ").slice(0,2).map(w => w[0]).join("");
   document.getElementById("r-avatar").textContent    = initials;
   document.getElementById("r-name").textContent      = student.name;
-  document.getElementById("r-id-label").textContent  = "ط±ظ‚ظ… ط§ظ„ظ‚ظٹط¯: " + student.id;
+  document.getElementById("r-id-label").textContent  = "رقم القيد: " + student.id;
 
   const cards = document.getElementById("r-cards");
   cards.innerHTML = results.map(r => {
     const g = getGrade(r.score);
     return `
       <div class="result-row">
-        <span class="subject">ًں“ڑ ${r.subject}</span>
+        <span class="subject">📚 ${r.subject}</span>
         <div style="display:flex;align-items:center;gap:.75rem">
           <span class="score-num">${r.score}</span>
-          <span class="badge badge-${g.toLowerCase()}">${g} â€” ${getGradeLabel(g)}</span>
+          <span class="badge badge-${g.toLowerCase()}">${g} — ${getGradeLabel(g)}</span>
         </div>
       </div>`;
   }).join("");
@@ -159,15 +159,15 @@ function showStudentResult(results) {
   const avg = Math.round(results.reduce((a, r) => a + r.score, 0) / results.length);
   const g   = getGrade(avg);
   document.getElementById("r-avg").textContent   = avg + "%";
-  document.getElementById("r-grade").textContent = g + " â€” " + getGradeLabel(g);
-  document.getElementById("r-status").textContent = avg >= 60 ? "âœ… ظ†ط§ط¬ط­" : "â‌Œ ط±ط§ط³ط¨";
+  document.getElementById("r-grade").textContent = g + " — " + getGradeLabel(g);
+  document.getElementById("r-status").textContent = avg >= 60 ? "✅ ناجح" : "❌ راسب";
   document.getElementById("r-status").style.color = avg >= 60 ? "#34d399" : "#f87171";
 
   showScreen("screen-student-result");
 }
 
 /* ===================================================
-   طھط³ط¬ظٹظ„ ط§ظ„ط®ط±ظˆط¬
+   تسجيل الخروج
    =================================================== */
 function logout() {
   students = [];
@@ -175,7 +175,7 @@ function logout() {
 }
 
 /* ===================================================
-   ط¥ط­طµط§ط¦ظٹط§طھ ط§ظ„ط£ط³طھط§ط°
+   إحصائيات الأستاذ
    =================================================== */
 function renderStats() {
   const total  = students.length;
@@ -183,16 +183,16 @@ function renderStats() {
   const avg    = total ? Math.round(students.reduce((a, s) => a + s.score, 0) / total) : 0;
   const top    = total ? Math.max(...students.map(s => s.score)) : 0;
   document.getElementById("stats").innerHTML = `
-    <div class="stat-card"><div class="stat-label">ط¥ط¬ظ…ط§ظ„ظٹ ط§ظ„ط·ظ„ط§ط¨</div><div class="stat-value">${total}</div></div>
-    <div class="stat-card"><div class="stat-label">ط§ظ„ظ†ط§ط¬ط­ظˆظ†</div><div class="stat-value">${passed}</div></div>
-    <div class="stat-card"><div class="stat-label">ط§ظ„ط±ط§ط³ط¨ظˆظ†</div><div class="stat-value">${total - passed}</div></div>
-    <div class="stat-card"><div class="stat-label">ظ…طھظˆط³ط· ط§ظ„ط¯ط±ط¬ط§طھ</div><div class="stat-value">${avg}%</div></div>
-    <div class="stat-card"><div class="stat-label">ط£ط¹ظ„ظ‰ ط¯ط±ط¬ط©</div><div class="stat-value">${top}</div></div>
+    <div class="stat-card"><div class="stat-label">إجمالي الطلاب</div><div class="stat-value">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">الناجحون</div><div class="stat-value">${passed}</div></div>
+    <div class="stat-card"><div class="stat-label">الراسبون</div><div class="stat-value">${total - passed}</div></div>
+    <div class="stat-card"><div class="stat-label">متوسط الدرجات</div><div class="stat-value">${avg}%</div></div>
+    <div class="stat-card"><div class="stat-label">أعلى درجة</div><div class="stat-value">${top}</div></div>
   `;
 }
 
 /* ===================================================
-   ط¬ط¯ظˆظ„ ط§ظ„ط£ط³طھط§ط°
+   جدول الأستاذ
    =================================================== */
 function renderTable() {
   const q  = document.getElementById("search").value.trim().toLowerCase();
@@ -204,7 +204,7 @@ function renderTable() {
   });
   const tbody = document.getElementById("tbody");
   if (!filtered.length) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">ظ„ط§ طھظˆط¬ط¯ ظ†طھط§ط¦ط¬ ظ…ط·ط§ط¨ظ‚ط©</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">لا توجد نتائج مطابقة</td></tr>`;
     return;
   }
   tbody.innerHTML = filtered.map(s => {
@@ -215,10 +215,10 @@ function renderTable() {
         <td><strong>${s.name}</strong></td>
         <td>${s.subject}</td>
         <td style="font-weight:700;color:#60a5fa">${s.score}</td>
-        <td><span class="badge badge-${g.toLowerCase()}">${g} â€” ${getGradeLabel(g)}</span></td>
+        <td><span class="badge badge-${g.toLowerCase()}">${g} — ${getGradeLabel(g)}</span></td>
         <td>
-          <button class="btn-edit" onclick="editStudent('${s._docId}')">طھط¹ط¯ظٹظ„</button>
-          <button class="btn-del"  onclick="deleteStudent('${s._docId}')">ط­ط°ظپ</button>
+          <button class="btn-edit" onclick="editStudent('${s._docId}')">تعديل</button>
+          <button class="btn-del"  onclick="deleteStudent('${s._docId}')">حذف</button>
         </td>
       </tr>`;
   }).join("");
@@ -226,36 +226,36 @@ function renderTable() {
 }
 
 /* ===================================================
-   ط­ط°ظپ ط·ط§ظ„ط¨
+   حذف طالب
    =================================================== */
 async function deleteStudent(docId) {
-  if (!confirm("ظ‡ظ„ ط£ظ†طھ ظ…طھط£ظƒط¯ ظ…ظ† ط­ط°ظپ ظ‡ط°ظ‡ ط§ظ„ظ†طھظٹط¬ط©طں")) return;
+  if (!confirm("هل أنت متأكد من حذف هذه النتيجة؟")) return;
   showLoading(true);
   try {
     await deleteDoc(doc(db, COL, docId));
     students = students.filter(s => s._docId !== docId);
     renderTable();
   } catch (e) {
-    alert("âڑ ï¸ڈ طھط¹ط°ظ‘ط± ط§ظ„ط­ط°ظپطŒ ط­ط§ظˆظ„ ظ…ط¬ط¯ط¯ط§ظ‹.");
+    alert("⚠️ تعذّر الحذف، حاول مجدداً.");
     console.error(e);
   }
   showLoading(false);
 }
 
 /* ===================================================
-   طھط¹ط¯ظٹظ„ ط·ط§ظ„ط¨
+   تعديل طالب
    =================================================== */
 async function editStudent(docId) {
   const s = students.find(st => st._docId === docId);
   if (!s) return;
   const newScore = prompt(
-    `طھط¹ط¯ظٹظ„ ط¯ط±ط¬ط© "${s.name}" ظپظٹ ظ…ط§ط¯ط© "${s.subject}"\nط§ظ„ط¯ط±ط¬ط© ط§ظ„ط­ط§ظ„ظٹط©: ${s.score}\nط£ط¯ط®ظ„ ط§ظ„ط¯ط±ط¬ط© ط§ظ„ط¬ط¯ظٹط¯ط©:`,
+    `تعديل درجة "${s.name}" في مادة "${s.subject}"\nالدرجة الحالية: ${s.score}\nأدخل الدرجة الجديدة:`,
     s.score
   );
   if (newScore === null) return;
   const parsed = parseInt(newScore);
   if (isNaN(parsed) || parsed < 0 || parsed > 100) {
-    alert("âڑ ï¸ڈ ط§ظ„ط¯ط±ط¬ط© ظٹط¬ط¨ ط£ظ† طھظƒظˆظ† ط¨ظٹظ† 0 ظˆ 100");
+    alert("⚠️ الدرجة يجب أن تكون بين 0 و 100");
     return;
   }
   showLoading(true);
@@ -264,14 +264,14 @@ async function editStudent(docId) {
     s.score = parsed;
     renderTable();
   } catch (e) {
-    alert("âڑ ï¸ڈ طھط¹ط°ظ‘ط± ط§ظ„طھط¹ط¯ظٹظ„طŒ ط­ط§ظˆظ„ ظ…ط¬ط¯ط¯ط§ظ‹.");
+    alert("⚠️ تعذّر التعديل، حاول مجدداً.");
     console.error(e);
   }
   showLoading(false);
 }
 
 /* ===================================================
-   ط¥ط¶ط§ظپط© ط·ط§ظ„ط¨
+   إضافة طالب
    =================================================== */
 async function addStudent() {
   const id      = document.getElementById("nId").value.trim();
@@ -281,12 +281,12 @@ async function addStudent() {
   const msg     = document.getElementById("formMsg");
 
   if (!id || !name || !subject) {
-    msg.textContent = "âڑ ï¸ڈ ظٹط±ط¬ظ‰ ظ…ظ„ط، ط¬ظ…ظٹط¹ ط§ظ„ط­ظ‚ظˆظ„.";
+    msg.textContent = "⚠️ يرجى ملء جميع الحقول.";
     msg.className   = "form-msg error";
     return;
   }
   if (isNaN(score) || score < 0 || score > 100) {
-    msg.textContent = "âڑ ï¸ڈ ط§ظ„ط¯ط±ط¬ط© ظٹط¬ط¨ ط£ظ† طھظƒظˆظ† ط¨ظٹظ† 0 ظˆ 100.";
+    msg.textContent = "⚠️ الدرجة يجب أن تكون بين 0 و 100.";
     msg.className   = "form-msg error";
     return;
   }
@@ -296,12 +296,12 @@ async function addStudent() {
     const docRef = await addDoc(collection(db, COL), { id, name, subject, score });
     students.push({ _docId: docRef.id, id, name, subject, score });
     ["nId","nName","nSubject","nScore"].forEach(k => document.getElementById(k).value = "");
-    msg.textContent = `âœ… طھظ…طھ ط¥ط¶ط§ظپط© ${name} ط¨ظ†ط¬ط§ط­.`;
+    msg.textContent = `✅ تمت إضافة ${name} بنجاح.`;
     msg.className   = "form-msg success";
     setTimeout(() => (msg.textContent = ""), 3000);
     renderTable();
   } catch (e) {
-    msg.textContent = "âڑ ï¸ڈ طھط¹ط°ظ‘ط±طھ ط§ظ„ط¥ط¶ط§ظپط©طŒ ط­ط§ظˆظ„ ظ…ط¬ط¯ط¯ط§ظ‹.";
+    msg.textContent = "⚠️ تعذّرت الإضافة، حاول مجدداً.";
     msg.className   = "form-msg error";
     console.error(e);
   }
@@ -309,7 +309,7 @@ async function addStudent() {
 }
 
 /* ===================================================
-   طھظ‡ظٹط¦ط© ط§ظ„طµظپط­ط©
+   تهيئة الصفحة
    =================================================== */
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("t-pass").addEventListener("keydown", e => {
@@ -322,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ===================================================
-   طھطµط¯ظٹط± ط§ظ„ط¯ظˆط§ظ„ ظ„ظ„ظ€ HTML (onclick)
+   تصدير الدوال للـ HTML (onclick)
    =================================================== */
 window.showScreen     = showScreen;
 window.teacherLogin   = teacherLogin;
