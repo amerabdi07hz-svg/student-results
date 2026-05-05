@@ -1,0 +1,300 @@
+/* ===== عام ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+  min-height: 100vh;
+  direction: rtl;
+}
+
+/* ===== الشاشات ===== */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ===== شاشة الاختيار ===== */
+#screen-home {
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.home-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 30% 20%, #1e3a5f55 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 80%, #1e4d2b44 0%, transparent 60%),
+              #0f172a;
+}
+
+.home-center {
+  position: relative;
+  text-align: center;
+  padding: 2rem;
+  z-index: 1;
+}
+
+.logo { font-size: 4rem; margin-bottom: 1rem; animation: floatLogo 3s ease-in-out infinite; }
+@keyframes floatLogo { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+.home-title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #60a5fa, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: .5rem;
+}
+
+.home-sub { color: #94a3b8; font-size: 1.1rem; margin-bottom: 2.5rem; }
+
+.home-cards { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
+
+.role-card {
+  background: #1e293b;
+  border: 1.5px solid #334155;
+  border-radius: 20px;
+  padding: 2rem 2.5rem;
+  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: .6rem;
+  transition: transform .2s, border-color .2s, box-shadow .2s;
+  min-width: 200px;
+}
+.role-card:hover {
+  transform: translateY(-6px);
+  border-color: #60a5fa;
+  box-shadow: 0 12px 40px #60a5fa22;
+}
+.role-icon { font-size: 3rem; }
+.role-label { font-size: 1.3rem; font-weight: 700; color: #f1f5f9; }
+.role-desc { font-size: .9rem; color: #64748b; }
+
+/* ===== شاشات تسجيل الدخول ===== */
+.login-wrap {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 2rem;
+}
+
+.login-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 100%; max-width: 420px;
+  display: flex; flex-direction: column; gap: 1.2rem;
+}
+
+.login-icon { font-size: 3rem; text-align: center; }
+.login-card h2 { text-align: center; font-size: 1.5rem; font-weight: 700; color: #f1f5f9; }
+
+.field-group { display: flex; flex-direction: column; gap: .4rem; }
+.field-group label { font-size: .9rem; color: #94a3b8; }
+.field-group input {
+  padding: .75rem 1rem;
+  background: #0f172a;
+  border: 1.5px solid #334155;
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color .2s;
+}
+.field-group input:focus { border-color: #60a5fa; }
+
+/* ===== أزرار ===== */
+.btn-primary {
+  padding: .85rem;
+  background: linear-gradient(135deg, #2563eb, #059669);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .2s, transform .15s;
+}
+.btn-primary:hover { opacity: .9; transform: scale(1.01); }
+
+.back-btn {
+  align-self: flex-start;
+  background: none;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: .5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  margin-bottom: 1rem;
+  transition: border-color .2s, color .2s;
+}
+.back-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+
+.err-msg { color: #f87171; font-size: .88rem; min-height: 1rem; text-align: center; }
+
+/* ===== شاشة نتيجة الطالب ===== */
+.result-wrap {
+  flex: 1; padding: 2rem;
+  display: flex; flex-direction: column; gap: 1.5rem;
+  max-width: 700px; margin: 0 auto; width: 100%;
+}
+
+.result-header {
+  display: flex; align-items: center; gap: 1rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.result-avatar {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #059669);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+
+.result-name { font-size: 1.3rem; font-weight: 700; color: #f1f5f9; }
+.result-id { font-size: .9rem; color: #64748b; margin-top: .2rem; }
+
+.result-cards { display: flex; flex-direction: column; gap: .75rem; }
+
+.result-row {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.result-row .subject { font-weight: 600; color: #e2e8f0; }
+.result-row .score-num { font-size: 1.4rem; font-weight: 800; color: #60a5fa; }
+
+.result-summary {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1rem; text-align: center;
+}
+.summary-label { font-size: .85rem; color: #64748b; display: block; margin-bottom: .3rem; }
+.summary-val { font-size: 1.5rem; font-weight: 800; color: #34d399; }
+
+/* ===== لوحة الأستاذ ===== */
+.teacher-wrap {
+  flex: 1; padding: 1.5rem;
+  max-width: 1100px; margin: 0 auto; width: 100%;
+  display: flex; flex-direction: column; gap: 1.5rem;
+}
+
+.t-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #334155;
+}
+.t-title { font-size: 1.5rem; font-weight: 800; color: #f1f5f9; }
+.t-sub { font-size: .9rem; color: #64748b; }
+
+.btn-logout {
+  background: none; border: 1px solid #ef4444;
+  color: #ef4444; padding: .5rem 1.2rem; border-radius: 8px;
+  font-family: 'Tajawal', sans-serif; cursor: pointer;
+  transition: background .2s;
+}
+.btn-logout:hover { background: #ef44441a; }
+
+/* إحصائيات */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 1rem; }
+.stat-card {
+  background: #1e293b; border: 1px solid #334155; border-radius: 14px;
+  padding: 1.2rem; text-align: center;
+}
+.stat-label { font-size: .82rem; color: #64748b; margin-bottom: .4rem; }
+.stat-value { font-size: 2rem; font-weight: 800; color: #60a5fa; }
+
+/* بحث */
+.controls { display: flex; gap: .75rem; flex-wrap: wrap; }
+.controls input, .controls select {
+  padding: .65rem 1rem;
+  background: #1e293b; border: 1px solid #334155;
+  border-radius: 10px; color: #e2e8f0;
+  font-family: 'Tajawal', sans-serif; font-size: .95rem;
+  outline: none; transition: border-color .2s;
+}
+.controls input { flex: 1; min-width: 200px; }
+.controls input:focus, .controls select:focus { border-color: #60a5fa; }
+.controls select option { background: #1e293b; }
+
+/* جدول */
+.table-wrap { background: #1e293b; border: 1px solid #334155; border-radius: 14px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; font-size: .93rem; }
+th {
+  background: #0f172a; padding: .9rem 1rem;
+  text-align: right; font-weight: 600; color: #94a3b8;
+  border-bottom: 1px solid #334155;
+}
+td { padding: .8rem 1rem; border-bottom: 1px solid #1e293b; color: #e2e8f0; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: #ffffff08; }
+
+/* شارات التقدير */
+.badge { display: inline-block; padding: .25rem .8rem; border-radius: 999px; font-size: .82rem; font-weight: 700; }
+.badge-a { background: #166534; color: #bbf7d0; }
+.badge-b { background: #1e3a5f; color: #93c5fd; }
+.badge-c { background: #78350f; color: #fde68a; }
+.badge-f { background: #7f1d1d; color: #fca5a5; }
+
+/* أزرار إجراءات */
+.btn-edit {
+  background: none; border: 1px solid #3b82f6; color: #60a5fa;
+  padding: .25rem .7rem; border-radius: 6px; cursor: pointer;
+  font-family: 'Tajawal', sans-serif; font-size: .82rem; margin-left: .3rem;
+  transition: background .2s;
+}
+.btn-edit:hover { background: #3b82f620; }
+.btn-del {
+  background: none; border: 1px solid #ef4444; color: #f87171;
+  padding: .25rem .7rem; border-radius: 6px; cursor: pointer;
+  font-family: 'Tajawal', sans-serif; font-size: .82rem;
+  transition: background .2s;
+}
+.btn-del:hover { background: #ef444420; }
+
+/* نموذج الإضافة */
+.add-section {
+  background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 1.5rem;
+}
+.add-section h3 { font-size: 1rem; font-weight: 700; color: #f1f5f9; margin-bottom: 1rem; }
+.form-row { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
+.form-row input {
+  flex: 1; min-width: 130px; padding: .65rem 1rem;
+  background: #0f172a; border: 1px solid #334155;
+  border-radius: 10px; color: #e2e8f0;
+  font-family: 'Tajawal', sans-serif; font-size: .93rem; outline: none;
+  transition: border-color .2s;
+}
+.form-row input:focus { border-color: #60a5fa; }
+.btn-add {
+  padding: .65rem 1.4rem; background: #059669; border: none;
+  border-radius: 10px; color: #fff;
+  font-family: 'Tajawal', sans-serif; font-size: .95rem; font-weight: 700;
+  cursor: pointer; white-space: nowrap; transition: background .2s;
+}
+.btn-add:hover { background: #047857; }
+
+.form-msg { margin-top: .75rem; font-size: .88rem; min-height: 1.2rem; }
+.form-msg.error { color: #f87171; }
+.form-msg.success { color: #34d399; }
+
+.empty-row td { text-align: center; padding: 2rem; color: #475569; }
+
+/* استجابة */
+@media (max-width: 600px) {
+  .home-title { font-size: 1.7rem; }
+  .result-summary { grid-template-columns: 1fr; }
+  th, td { padding: .6rem .6rem; font-size: .84rem; }
+}
