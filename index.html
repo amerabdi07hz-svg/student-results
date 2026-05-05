@@ -3,78 +3,78 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>بوابة النتائج</title>
+  <title>ط¨ظˆط§ط¨ط© ط§ظ„ظ†طھط§ط¦ط¬</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-<!-- ======= شاشة الاختيار ======= -->
+<!-- ======= ط´ط§ط´ط© ط§ظ„ط§ط®طھظٹط§ط± ======= -->
 <div id="screen-home" class="screen active">
   <div class="home-bg"></div>
   <div class="home-center">
-    <div class="logo">🎓</div>
-    <h1 class="home-title">بوابة نتائج الطلبة</h1>
-    <p class="home-sub">اختر نوع الدخول</p>
+    <div class="logo">ًںژ“</div>
+    <h1 class="home-title">ط¨ظˆط§ط¨ط© ظ†طھط§ط¦ط¬ ط§ظ„ط·ظ„ط¨ط©</h1>
+    <p class="home-sub">ط§ط®طھط± ظ†ظˆط¹ ط§ظ„ط¯ط®ظˆظ„</p>
     <div class="home-cards">
       <button class="role-card" onclick="showScreen('screen-teacher-login')">
-        <span class="role-icon">👨‍🏫</span>
-        <span class="role-label">دخول الأستاذ</span>
-        <span class="role-desc">إدارة وتعديل النتائج</span>
+        <span class="role-icon">ًں‘¨â€چًںڈ«</span>
+        <span class="role-label">ط¯ط®ظˆظ„ ط§ظ„ط£ط³طھط§ط°</span>
+        <span class="role-desc">ط¥ط¯ط§ط±ط© ظˆطھط¹ط¯ظٹظ„ ط§ظ„ظ†طھط§ط¦ط¬</span>
       </button>
       <button class="role-card" onclick="showScreen('screen-student-login')">
-        <span class="role-icon">👨‍🎓</span>
-        <span class="role-label">دخول الطالب</span>
-        <span class="role-desc">عرض نتيجتك</span>
+        <span class="role-icon">ًں‘¨â€چًںژ“</span>
+        <span class="role-label">ط¯ط®ظˆظ„ ط§ظ„ط·ط§ظ„ط¨</span>
+        <span class="role-desc">ط¹ط±ط¶ ظ†طھظٹط¬طھظƒ</span>
       </button>
     </div>
   </div>
 </div>
 
-<!-- ======= شاشة تسجيل دخول الأستاذ ======= -->
+<!-- ======= ط´ط§ط´ط© طھط³ط¬ظٹظ„ ط¯ط®ظˆظ„ ط§ظ„ط£ط³طھط§ط° ======= -->
 <div id="screen-teacher-login" class="screen">
   <div class="login-wrap">
-    <button class="back-btn" onclick="showScreen('screen-home')">→ رجوع</button>
+    <button class="back-btn" onclick="showScreen('screen-home')">â†’ ط±ط¬ظˆط¹</button>
     <div class="login-card">
-      <div class="login-icon">👨‍🏫</div>
-      <h2>دخول الأستاذ</h2>
+      <div class="login-icon">ًں‘¨â€چًںڈ«</div>
+      <h2>ط¯ط®ظˆظ„ ط§ظ„ط£ط³طھط§ط°</h2>
       <div class="field-group">
-        <label>اسم المستخدم</label>
-        <input type="text" id="t-user" placeholder="أدخل اسم المستخدم"/>
+        <label>ط§ط³ظ… ط§ظ„ظ…ط³طھط®ط¯ظ…</label>
+        <input type="text" id="t-user" placeholder="ط£ط¯ط®ظ„ ط§ط³ظ… ط§ظ„ظ…ط³طھط®ط¯ظ…"/>
       </div>
       <div class="field-group">
-        <label>كلمة المرور</label>
-        <input type="password" id="t-pass" placeholder="أدخل كلمة المرور"/>
+        <label>ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±</label>
+        <input type="password" id="t-pass" placeholder="ط£ط¯ط®ظ„ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±"/>
       </div>
       <p id="t-err" class="err-msg"></p>
-      <button class="btn-primary" onclick="teacherLogin()">دخول</button>
+      <button class="btn-primary" onclick="teacherLogin()">ط¯ط®ظˆظ„</button>
     </div>
   </div>
 </div>
 
-<!-- ======= شاشة دخول الطالب ======= -->
+<!-- ======= ط´ط§ط´ط© ط¯ط®ظˆظ„ ط§ظ„ط·ط§ظ„ط¨ ======= -->
 <div id="screen-student-login" class="screen">
   <div class="login-wrap">
-    <button class="back-btn" onclick="showScreen('screen-home')">→ رجوع</button>
+    <button class="back-btn" onclick="showScreen('screen-home')">â†’ ط±ط¬ظˆط¹</button>
     <div class="login-card">
-      <div class="login-icon">👨‍🎓</div>
-      <h2>دخول الطالب</h2>
+      <div class="login-icon">ًں‘¨â€چًںژ“</div>
+      <h2>ط¯ط®ظˆظ„ ط§ظ„ط·ط§ظ„ط¨</h2>
       <div class="field-group">
-        <label>رقم القيد</label>
-        <input type="text" id="s-id" placeholder="أدخل رقم القيد"/>
+        <label>ط±ظ‚ظ… ط§ظ„ظ‚ظٹط¯</label>
+        <input type="text" id="s-id" placeholder="ط£ط¯ط®ظ„ ط±ظ‚ظ… ط§ظ„ظ‚ظٹط¯"/>
       </div>
       <p id="s-err" class="err-msg"></p>
-      <button class="btn-primary" onclick="studentLogin()">عرض النتيجة</button>
+      <button class="btn-primary" onclick="studentLogin()">ط¹ط±ط¶ ط§ظ„ظ†طھظٹط¬ط©</button>
     </div>
   </div>
 </div>
 
-<!-- ======= شاشة نتيجة الطالب ======= -->
+<!-- ======= ط´ط§ط´ط© ظ†طھظٹط¬ط© ط§ظ„ط·ط§ظ„ط¨ ======= -->
 <div id="screen-student-result" class="screen">
   <div class="result-wrap">
-    <button class="back-btn" onclick="showScreen('screen-student-login')">→ رجوع</button>
+    <button class="back-btn" onclick="showScreen('screen-student-login')">â†’ ط±ط¬ظˆط¹</button>
     <div class="result-header">
-      <div class="result-avatar" id="r-avatar">ط</div>
+      <div class="result-avatar" id="r-avatar">ط·</div>
       <div>
         <div class="result-name" id="r-name"></div>
         <div class="result-id" id="r-id-label"></div>
@@ -83,74 +83,74 @@
     <div id="r-cards" class="result-cards"></div>
     <div class="result-summary">
       <div class="summary-item">
-        <span class="summary-label">المعدل العام</span>
+        <span class="summary-label">ط§ظ„ظ…ط¹ط¯ظ„ ط§ظ„ط¹ط§ظ…</span>
         <span class="summary-val" id="r-avg"></span>
       </div>
       <div class="summary-item">
-        <span class="summary-label">التقدير العام</span>
+        <span class="summary-label">ط§ظ„طھظ‚ط¯ظٹط± ط§ظ„ط¹ط§ظ…</span>
         <span class="summary-val" id="r-grade"></span>
       </div>
       <div class="summary-item">
-        <span class="summary-label">الحالة</span>
+        <span class="summary-label">ط§ظ„ط­ط§ظ„ط©</span>
         <span class="summary-val" id="r-status"></span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ======= لوحة الأستاذ ======= -->
+<!-- ======= ظ„ظˆط­ط© ط§ظ„ط£ط³طھط§ط° ======= -->
 <div id="screen-teacher" class="screen">
   <div class="teacher-wrap">
 
     <header class="t-header">
       <div>
-        <div class="t-title">🎓 لوحة الأستاذ</div>
-        <div class="t-sub">إدارة نتائج الطلبة</div>
+        <div class="t-title">ًںژ“ ظ„ظˆط­ط© ط§ظ„ط£ط³طھط§ط°</div>
+        <div class="t-sub">ط¥ط¯ط§ط±ط© ظ†طھط§ط¦ط¬ ط§ظ„ط·ظ„ط¨ط©</div>
       </div>
-      <button class="btn-logout" onclick="logout()">تسجيل خروج</button>
+      <button class="btn-logout" onclick="logout()">طھط³ط¬ظٹظ„ ط®ط±ظˆط¬</button>
     </header>
 
-    <!-- إحصائيات -->
+    <!-- ط¥ط­طµط§ط¦ظٹط§طھ -->
     <div class="stats-grid" id="stats"></div>
 
-    <!-- بحث وفلترة -->
+    <!-- ط¨ط­ط« ظˆظپظ„طھط±ط© -->
     <div class="controls">
-      <input type="text" id="search" placeholder="🔍 ابحث بالاسم أو رقم القيد..." oninput="renderTable()"/>
+      <input type="text" id="search" placeholder="ًں”چ ط§ط¨ط­ط« ط¨ط§ظ„ط§ط³ظ… ط£ظˆ ط±ظ‚ظ… ط§ظ„ظ‚ظٹط¯..." oninput="renderTable()"/>
       <select id="filterGrade" onchange="renderTable()">
-        <option value="">جميع التقديرات</option>
-        <option value="A">ممتاز (A)</option>
-        <option value="B">جيد جداً (B)</option>
-        <option value="C">جيد (C)</option>
-        <option value="F">راسب (F)</option>
+        <option value="">ط¬ظ…ظٹط¹ ط§ظ„طھظ‚ط¯ظٹط±ط§طھ</option>
+        <option value="A">ظ…ظ…طھط§ط² (A)</option>
+        <option value="B">ط¬ظٹط¯ ط¬ط¯ط§ظ‹ (B)</option>
+        <option value="C">ط¬ظٹط¯ (C)</option>
+        <option value="F">ط±ط§ط³ط¨ (F)</option>
       </select>
     </div>
 
-    <!-- جدول النتائج -->
+    <!-- ط¬ط¯ظˆظ„ ط§ظ„ظ†طھط§ط¦ط¬ -->
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>رقم القيد</th>
-            <th>اسم الطالب</th>
-            <th>المادة</th>
-            <th>الدرجة</th>
-            <th>التقدير</th>
-            <th>إجراءات</th>
+            <th>ط±ظ‚ظ… ط§ظ„ظ‚ظٹط¯</th>
+            <th>ط§ط³ظ… ط§ظ„ط·ط§ظ„ط¨</th>
+            <th>ط§ظ„ظ…ط§ط¯ط©</th>
+            <th>ط§ظ„ط¯ط±ط¬ط©</th>
+            <th>ط§ظ„طھظ‚ط¯ظٹط±</th>
+            <th>ط¥ط¬ط±ط§ط،ط§طھ</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
 
-    <!-- إضافة طالب -->
+    <!-- ط¥ط¶ط§ظپط© ط·ط§ظ„ط¨ -->
     <div class="add-section">
-      <h3>➕ إضافة نتيجة طالب</h3>
+      <h3>â‍• ط¥ط¶ط§ظپط© ظ†طھظٹط¬ط© ط·ط§ظ„ط¨</h3>
       <div class="form-row">
-        <input type="text"   id="nId"      placeholder="رقم القيد"/>
-        <input type="text"   id="nName"    placeholder="اسم الطالب"/>
-        <input type="text"   id="nSubject" placeholder="المادة"/>
-        <input type="number" id="nScore"   placeholder="الدرجة (0-100)" min="0" max="100"/>
-        <button class="btn-add" onclick="addStudent()">إضافة</button>
+        <input type="text"   id="nId"      placeholder="ط±ظ‚ظ… ط§ظ„ظ‚ظٹط¯"/>
+        <input type="text"   id="nName"    placeholder="ط§ط³ظ… ط§ظ„ط·ط§ظ„ط¨"/>
+        <input type="text"   id="nSubject" placeholder="ط§ظ„ظ…ط§ط¯ط©"/>
+        <input type="number" id="nScore"   placeholder="ط§ظ„ط¯ط±ط¬ط© (0-100)" min="0" max="100"/>
+        <button class="btn-add" onclick="addStudent()">ط¥ط¶ط§ظپط©</button>
       </div>
       <p id="formMsg" class="form-msg"></p>
     </div>
@@ -158,6 +158,6 @@
   </div>
 </div>
 
-<script src="app.js"></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>
