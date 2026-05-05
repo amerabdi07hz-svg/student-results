@@ -1,24 +1,39 @@
 /* ===================================================
-   app.js — بوابة نتائج الطلبة
+   app.js â€” ط¨ظˆط§ط¨ط© ظ†طھط§ط¦ط¬ ط§ظ„ط·ظ„ط¨ط© (ظ…ط¹ Firebase)
    =================================================== */
 
-/* -------- بيانات الأستاذ -------- */
+/* -------- ط¥ط¹ط¯ط§ط¯ط§طھ Firebase -------- */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs,
+  updateDoc, deleteDoc, doc, query, where
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// â¬‡ï¸ڈ ط¶ط¹ ظ‡ظ†ط§ ط¥ط¹ط¯ط§ط¯ط§طھ ظ…ط´ط±ظˆط¹ظƒ ظ…ظ† Firebase Console
+const firebaseConfig = {
+  apiKey:            "AIzaSyCOroJ-c4WMseSVYAjniCkqT9tvbFxFCwk",
+  authDomain:        "ameerabdi07hz.firebaseapp.com",
+  projectId:         "ameerabdi07hz",
+  storageBucket:     "ameerabdi07hz.firebasestorage.app",
+  messagingSenderId: "828694243912",
+  appId:             "1:828694243912:web:2aa0c4cf35f6ded54c467d",
+  measurementId:     "G-FB7Y1ZZ8HE"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+const COL = "students"; // ط§ط³ظ… ط§ظ„ظ…ط¬ظ…ظˆط¹ط© ظپظٹ Firestore
+
+/* -------- ط¨ظٹط§ظ†ط§طھ ط§ظ„ط£ط³طھط§ط° -------- */
 const TEACHER_USER = "abdo";
 const TEACHER_PASS = "hz5758";
 
-/* -------- بيانات الطلبة (يمكن الإضافة والحذف من لوحة الأستاذ) -------- */
-let students = [
-  { id: "2021001", name: "أحمد محمد العمري",      subject: "رياضيات", score: 92 },
-  { id: "2021002", name: "فاطمة علي الزهراني",    subject: "فيزياء",   score: 78 },
-  { id: "2021003", name: "محمد سالم الغامدي",     subject: "رياضيات", score: 55 },
-  { id: "2021004", name: "نورة عبدالله الحربي",   subject: "كيمياء",  score: 88 },
-  { id: "2021005", name: "عمر خالد المطيري",      subject: "فيزياء",   score: 45 },
-  { id: "2021006", name: "ريم سعد القحطاني",      subject: "كيمياء",  score: 97 },
-  { id: "2021007", name: "يوسف إبراهيم الدوسري", subject: "رياضيات", score: 71 },
-  { id: "2021008", name: "هند ناصر البلوي",       subject: "فيزياء",   score: 83 },
-];
+/* -------- ظ…ط®ط²ظ† ظ…ط­ظ„ظٹ ظ…ط¤ظ‚طھ (ظٹظڈظ…ظ„ط£ ظ…ظ† Firebase) -------- */
+let students = [];
 
-/* -------- مساعدات التقدير -------- */
+/* ===================================================
+   ظ…ط³ط§ط¹ط¯ط§طھ ط§ظ„طھظ‚ط¯ظٹط±
+   =================================================== */
 function getGrade(score) {
   if (score >= 90) return "A";
   if (score >= 75) return "B";
@@ -26,10 +41,42 @@ function getGrade(score) {
   return "F";
 }
 function getGradeLabel(g) {
-  return { A: "ممتاز", B: "جيد جداً", C: "جيد", F: "راسب" }[g];
+  return { A: "ظ…ظ…طھط§ط²", B: "ط¬ظٹط¯ ط¬ط¯ط§ظ‹", C: "ط¬ظٹط¯", F: "ط±ط§ط³ط¨" }[g];
 }
 
-/* -------- التنقل بين الشاشات -------- */
+/* ===================================================
+   ط¬ظ„ط¨ ط§ظ„ط¨ظٹط§ظ†ط§طھ ظ…ظ† Firebase
+   =================================================== */
+async function loadStudents() {
+  showLoading(true);
+  try {
+    const snap = await getDocs(collection(db, COL));
+    students = snap.docs.map(d => ({ _docId: d.id, ...d.data() }));
+  } catch (e) {
+    console.error("ط®ط·ط£ ظپظٹ ط¬ظ„ط¨ ط§ظ„ط¨ظٹط§ظ†ط§طھ:", e);
+    alert("âڑ ï¸ڈ طھط¹ط°ظ‘ط± ط§ظ„ط§طھطµط§ظ„ ط¨ظ‚ط§ط¹ط¯ط© ط§ظ„ط¨ظٹط§ظ†ط§طھ. طھط£ظƒط¯ ظ…ظ† ط¥ط¹ط¯ط§ط¯ط§طھ Firebase.");
+  }
+  showLoading(false);
+}
+
+function showLoading(on) {
+  let el = document.getElementById("loading-overlay");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "loading-overlay";
+    el.style.cssText =
+      "position:fixed;inset:0;background:#0f172acc;display:flex;" +
+      "align-items:center;justify-content:center;z-index:9999;" +
+      "font-size:1.3rem;color:#60a5fa;font-family:'Tajawal',sans-serif;";
+    el.textContent = "âڈ³ ط¬ط§ط±ظچ ط§ظ„طھط­ظ…ظٹظ„...";
+    document.body.appendChild(el);
+  }
+  el.style.display = on ? "flex" : "none";
+}
+
+/* ===================================================
+   ط§ظ„طھظ†ظ‚ظ„ ط¨ظٹظ† ط§ظ„ط´ط§ط´ط§طھ
+   =================================================== */
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s => {
     s.classList.remove("active");
@@ -38,15 +85,16 @@ function showScreen(id) {
   const el = document.getElementById(id);
   el.style.display = "flex";
   el.classList.add("active");
-  // مسح رسائل الخطأ عند التنقل
   ["t-err","s-err"].forEach(e => {
-    const el = document.getElementById(e);
-    if (el) el.textContent = "";
+    const el2 = document.getElementById(e);
+    if (el2) el2.textContent = "";
   });
 }
 
-/* -------- دخول الأستاذ -------- */
-function teacherLogin() {
+/* ===================================================
+   ط¯ط®ظˆظ„ ط§ظ„ط£ط³طھط§ط°
+   =================================================== */
+async function teacherLogin() {
   const user = document.getElementById("t-user").value.trim();
   const pass = document.getElementById("t-pass").value.trim();
   const err  = document.getElementById("t-err");
@@ -54,82 +102,98 @@ function teacherLogin() {
     err.textContent = "";
     document.getElementById("t-user").value = "";
     document.getElementById("t-pass").value = "";
+    await loadStudents();
     showScreen("screen-teacher");
     renderStats();
     renderTable();
   } else {
-    err.textContent = "⚠️ اسم المستخدم أو كلمة المرور غير صحيحة";
+    err.textContent = "âڑ ï¸ڈ ط§ط³ظ… ط§ظ„ظ…ط³طھط®ط¯ظ… ط£ظˆ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± طµط­ظٹط­ط©";
   }
 }
 
-/* -------- دخول الطالب -------- */
-function studentLogin() {
+/* ===================================================
+   ط¯ط®ظˆظ„ ط§ظ„ط·ط§ظ„ط¨
+   =================================================== */
+async function studentLogin() {
   const sid = document.getElementById("s-id").value.trim();
   const err = document.getElementById("s-err");
-  // جمع كل نتائج الطالب
-  const results = students.filter(s => s.id === sid);
-  if (results.length === 0) {
-    err.textContent = "⚠️ رقم القيد غير موجود، يرجى التحقق.";
-    return;
+  showLoading(true);
+  try {
+    const q    = query(collection(db, COL), where("id", "==", sid));
+    const snap = await getDocs(q);
+    showLoading(false);
+    if (snap.empty) {
+      err.textContent = "âڑ ï¸ڈ ط±ظ‚ظ… ط§ظ„ظ‚ظٹط¯ ط؛ظٹط± ظ…ظˆط¬ظˆط¯طŒ ظٹط±ط¬ظ‰ ط§ظ„طھط­ظ‚ظ‚.";
+      return;
+    }
+    err.textContent = "";
+    const results = snap.docs.map(d => ({ _docId: d.id, ...d.data() }));
+    showStudentResult(results);
+  } catch (e) {
+    showLoading(false);
+    err.textContent = "âڑ ï¸ڈ طھط¹ط°ظ‘ط± ط§ظ„ط§طھطµط§ظ„ ط¨ظ‚ط§ط¹ط¯ط© ط§ظ„ط¨ظٹط§ظ†ط§طھ.";
+    console.error(e);
   }
-  err.textContent = "";
-  showStudentResult(results);
 }
 
 function showStudentResult(results) {
-  const student = results[0];
-  // الحروف الأولى للاسم
+  const student  = results[0];
   const initials = student.name.split(" ").slice(0,2).map(w => w[0]).join("");
-  document.getElementById("r-avatar").textContent = initials;
-  document.getElementById("r-name").textContent = student.name;
-  document.getElementById("r-id-label").textContent = "رقم القيد: " + student.id;
+  document.getElementById("r-avatar").textContent    = initials;
+  document.getElementById("r-name").textContent      = student.name;
+  document.getElementById("r-id-label").textContent  = "ط±ظ‚ظ… ط§ظ„ظ‚ظٹط¯: " + student.id;
 
-  // بطاقات المواد
   const cards = document.getElementById("r-cards");
   cards.innerHTML = results.map(r => {
     const g = getGrade(r.score);
     return `
       <div class="result-row">
-        <span class="subject">📚 ${r.subject}</span>
+        <span class="subject">ًں“ڑ ${r.subject}</span>
         <div style="display:flex;align-items:center;gap:.75rem">
           <span class="score-num">${r.score}</span>
-          <span class="badge badge-${g.toLowerCase()}">${g} — ${getGradeLabel(g)}</span>
+          <span class="badge badge-${g.toLowerCase()}">${g} â€” ${getGradeLabel(g)}</span>
         </div>
       </div>`;
   }).join("");
 
-  // المعدل والتقدير العام
   const avg = Math.round(results.reduce((a, r) => a + r.score, 0) / results.length);
   const g   = getGrade(avg);
   document.getElementById("r-avg").textContent   = avg + "%";
-  document.getElementById("r-grade").textContent = g + " — " + getGradeLabel(g);
-  document.getElementById("r-status").textContent = avg >= 60 ? "✅ ناجح" : "❌ راسب";
-  document.getElementById("r-status").style.color  = avg >= 60 ? "#34d399" : "#f87171";
+  document.getElementById("r-grade").textContent = g + " â€” " + getGradeLabel(g);
+  document.getElementById("r-status").textContent = avg >= 60 ? "âœ… ظ†ط§ط¬ط­" : "â‌Œ ط±ط§ط³ط¨";
+  document.getElementById("r-status").style.color = avg >= 60 ? "#34d399" : "#f87171";
 
   showScreen("screen-student-result");
 }
 
-/* -------- تسجيل الخروج -------- */
+/* ===================================================
+   طھط³ط¬ظٹظ„ ط§ظ„ط®ط±ظˆط¬
+   =================================================== */
 function logout() {
+  students = [];
   showScreen("screen-home");
 }
 
-/* -------- إحصائيات الأستاذ -------- */
+/* ===================================================
+   ط¥ط­طµط§ط¦ظٹط§طھ ط§ظ„ط£ط³طھط§ط°
+   =================================================== */
 function renderStats() {
   const total  = students.length;
   const passed = students.filter(s => s.score >= 60).length;
   const avg    = total ? Math.round(students.reduce((a, s) => a + s.score, 0) / total) : 0;
   const top    = total ? Math.max(...students.map(s => s.score)) : 0;
   document.getElementById("stats").innerHTML = `
-    <div class="stat-card"><div class="stat-label">إجمالي الطلاب</div><div class="stat-value">${total}</div></div>
-    <div class="stat-card"><div class="stat-label">الناجحون</div><div class="stat-value">${passed}</div></div>
-    <div class="stat-card"><div class="stat-label">الراسبون</div><div class="stat-value">${total - passed}</div></div>
-    <div class="stat-card"><div class="stat-label">متوسط الدرجات</div><div class="stat-value">${avg}%</div></div>
-    <div class="stat-card"><div class="stat-label">أعلى درجة</div><div class="stat-value">${top}</div></div>
+    <div class="stat-card"><div class="stat-label">ط¥ط¬ظ…ط§ظ„ظٹ ط§ظ„ط·ظ„ط§ط¨</div><div class="stat-value">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">ط§ظ„ظ†ط§ط¬ط­ظˆظ†</div><div class="stat-value">${passed}</div></div>
+    <div class="stat-card"><div class="stat-label">ط§ظ„ط±ط§ط³ط¨ظˆظ†</div><div class="stat-value">${total - passed}</div></div>
+    <div class="stat-card"><div class="stat-label">ظ…طھظˆط³ط· ط§ظ„ط¯ط±ط¬ط§طھ</div><div class="stat-value">${avg}%</div></div>
+    <div class="stat-card"><div class="stat-label">ط£ط¹ظ„ظ‰ ط¯ط±ط¬ط©</div><div class="stat-value">${top}</div></div>
   `;
 }
 
-/* -------- جدول الأستاذ -------- */
+/* ===================================================
+   ط¬ط¯ظˆظ„ ط§ظ„ط£ط³طھط§ط°
+   =================================================== */
 function renderTable() {
   const q  = document.getElementById("search").value.trim().toLowerCase();
   const fg = document.getElementById("filterGrade").value;
@@ -140,7 +204,7 @@ function renderTable() {
   });
   const tbody = document.getElementById("tbody");
   if (!filtered.length) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">لا توجد نتائج مطابقة</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">ظ„ط§ طھظˆط¬ط¯ ظ†طھط§ط¦ط¬ ظ…ط·ط§ط¨ظ‚ط©</td></tr>`;
     return;
   }
   tbody.innerHTML = filtered.map(s => {
@@ -151,40 +215,65 @@ function renderTable() {
         <td><strong>${s.name}</strong></td>
         <td>${s.subject}</td>
         <td style="font-weight:700;color:#60a5fa">${s.score}</td>
-        <td><span class="badge badge-${g.toLowerCase()}">${g} — ${getGradeLabel(g)}</span></td>
+        <td><span class="badge badge-${g.toLowerCase()}">${g} â€” ${getGradeLabel(g)}</span></td>
         <td>
-          <button class="btn-edit" onclick="editStudent('${s.id}')">تعديل</button>
-          <button class="btn-del"  onclick="deleteStudent('${s.id}')">حذف</button>
+          <button class="btn-edit" onclick="editStudent('${s._docId}')">طھط¹ط¯ظٹظ„</button>
+          <button class="btn-del"  onclick="deleteStudent('${s._docId}')">ط­ط°ظپ</button>
         </td>
       </tr>`;
   }).join("");
   renderStats();
 }
 
-/* -------- حذف طالب -------- */
-function deleteStudent(id) {
-  if (!confirm("هل أنت متأكد من حذف هذه النتيجة؟")) return;
-  students = students.filter(s => s.id !== id);
-  renderTable();
+/* ===================================================
+   ط­ط°ظپ ط·ط§ظ„ط¨
+   =================================================== */
+async function deleteStudent(docId) {
+  if (!confirm("ظ‡ظ„ ط£ظ†طھ ظ…طھط£ظƒط¯ ظ…ظ† ط­ط°ظپ ظ‡ط°ظ‡ ط§ظ„ظ†طھظٹط¬ط©طں")) return;
+  showLoading(true);
+  try {
+    await deleteDoc(doc(db, COL, docId));
+    students = students.filter(s => s._docId !== docId);
+    renderTable();
+  } catch (e) {
+    alert("âڑ ï¸ڈ طھط¹ط°ظ‘ط± ط§ظ„ط­ط°ظپطŒ ط­ط§ظˆظ„ ظ…ط¬ط¯ط¯ط§ظ‹.");
+    console.error(e);
+  }
+  showLoading(false);
 }
 
-/* -------- تعديل طالب -------- */
-function editStudent(id) {
-  const s = students.find(st => st.id === id);
+/* ===================================================
+   طھط¹ط¯ظٹظ„ ط·ط§ظ„ط¨
+   =================================================== */
+async function editStudent(docId) {
+  const s = students.find(st => st._docId === docId);
   if (!s) return;
-  const newScore = prompt(`تعديل درجة "${s.name}" في مادة "${s.subject}"\nالدرجة الحالية: ${s.score}\nأدخل الدرجة الجديدة:`, s.score);
+  const newScore = prompt(
+    `طھط¹ط¯ظٹظ„ ط¯ط±ط¬ط© "${s.name}" ظپظٹ ظ…ط§ط¯ط© "${s.subject}"\nط§ظ„ط¯ط±ط¬ط© ط§ظ„ط­ط§ظ„ظٹط©: ${s.score}\nط£ط¯ط®ظ„ ط§ظ„ط¯ط±ط¬ط© ط§ظ„ط¬ط¯ظٹط¯ط©:`,
+    s.score
+  );
   if (newScore === null) return;
   const parsed = parseInt(newScore);
   if (isNaN(parsed) || parsed < 0 || parsed > 100) {
-    alert("⚠️ الدرجة يجب أن تكون بين 0 و 100");
+    alert("âڑ ï¸ڈ ط§ظ„ط¯ط±ط¬ط© ظٹط¬ط¨ ط£ظ† طھظƒظˆظ† ط¨ظٹظ† 0 ظˆ 100");
     return;
   }
-  s.score = parsed;
-  renderTable();
+  showLoading(true);
+  try {
+    await updateDoc(doc(db, COL, docId), { score: parsed });
+    s.score = parsed;
+    renderTable();
+  } catch (e) {
+    alert("âڑ ï¸ڈ طھط¹ط°ظ‘ط± ط§ظ„طھط¹ط¯ظٹظ„طŒ ط­ط§ظˆظ„ ظ…ط¬ط¯ط¯ط§ظ‹.");
+    console.error(e);
+  }
+  showLoading(false);
 }
 
-/* -------- إضافة طالب -------- */
-function addStudent() {
+/* ===================================================
+   ط¥ط¶ط§ظپط© ط·ط§ظ„ط¨
+   =================================================== */
+async function addStudent() {
   const id      = document.getElementById("nId").value.trim();
   const name    = document.getElementById("nName").value.trim();
   const subject = document.getElementById("nSubject").value.trim();
@@ -192,25 +281,36 @@ function addStudent() {
   const msg     = document.getElementById("formMsg");
 
   if (!id || !name || !subject) {
-    msg.textContent = "⚠️ يرجى ملء جميع الحقول.";
-    msg.className = "form-msg error";
+    msg.textContent = "âڑ ï¸ڈ ظٹط±ط¬ظ‰ ظ…ظ„ط، ط¬ظ…ظٹط¹ ط§ظ„ط­ظ‚ظˆظ„.";
+    msg.className   = "form-msg error";
     return;
   }
   if (isNaN(score) || score < 0 || score > 100) {
-    msg.textContent = "⚠️ الدرجة يجب أن تكون بين 0 و 100.";
-    msg.className = "form-msg error";
+    msg.textContent = "âڑ ï¸ڈ ط§ظ„ط¯ط±ط¬ط© ظٹط¬ط¨ ط£ظ† طھظƒظˆظ† ط¨ظٹظ† 0 ظˆ 100.";
+    msg.className   = "form-msg error";
     return;
   }
 
-  students.push({ id, name, subject, score });
-  ["nId","nName","nSubject","nScore"].forEach(k => document.getElementById(k).value = "");
-  msg.textContent = `✅ تمت إضافة ${name} بنجاح.`;
-  msg.className = "form-msg success";
-  setTimeout(() => msg.textContent = "", 3000);
-  renderTable();
+  showLoading(true);
+  try {
+    const docRef = await addDoc(collection(db, COL), { id, name, subject, score });
+    students.push({ _docId: docRef.id, id, name, subject, score });
+    ["nId","nName","nSubject","nScore"].forEach(k => document.getElementById(k).value = "");
+    msg.textContent = `âœ… طھظ…طھ ط¥ط¶ط§ظپط© ${name} ط¨ظ†ط¬ط§ط­.`;
+    msg.className   = "form-msg success";
+    setTimeout(() => (msg.textContent = ""), 3000);
+    renderTable();
+  } catch (e) {
+    msg.textContent = "âڑ ï¸ڈ طھط¹ط°ظ‘ط±طھ ط§ظ„ط¥ط¶ط§ظپط©طŒ ط­ط§ظˆظ„ ظ…ط¬ط¯ط¯ط§ظ‹.";
+    msg.className   = "form-msg error";
+    console.error(e);
+  }
+  showLoading(false);
 }
 
-/* -------- دعم Enter في حقول تسجيل الدخول -------- */
+/* ===================================================
+   طھظ‡ظٹط¦ط© ط§ظ„طµظپط­ط©
+   =================================================== */
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("t-pass").addEventListener("keydown", e => {
     if (e.key === "Enter") teacherLogin();
@@ -218,6 +318,17 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("s-id").addEventListener("keydown", e => {
     if (e.key === "Enter") studentLogin();
   });
-  // تأكد من عرض الشاشة الرئيسية
   showScreen("screen-home");
 });
+
+/* ===================================================
+   طھطµط¯ظٹط± ط§ظ„ط¯ظˆط§ظ„ ظ„ظ„ظ€ HTML (onclick)
+   =================================================== */
+window.showScreen     = showScreen;
+window.teacherLogin   = teacherLogin;
+window.studentLogin   = studentLogin;
+window.logout         = logout;
+window.renderTable    = renderTable;
+window.editStudent    = editStudent;
+window.deleteStudent  = deleteStudent;
+window.addStudent     = addStudent;
