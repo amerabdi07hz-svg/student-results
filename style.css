@@ -32,6 +32,7 @@ body {
   position: relative;
   text-align: center;
   padding: 2rem;
+  padding-bottom: 100px; /* هذه القيمة ستدفع البطاقات للأعلى بعيداً عن الأسماء */
   z-index: 1;
 }
 
@@ -207,7 +208,6 @@ body {
 }
 .btn-logout:hover { background: #ef44441a; }
 
-/* إحصائيات */
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 1rem; }
 .stat-card {
   background: #1e293b; border: 1px solid #334155; border-radius: 14px;
@@ -216,7 +216,6 @@ body {
 .stat-label { font-size: .82rem; color: #64748b; margin-bottom: .4rem; }
 .stat-value { font-size: 2rem; font-weight: 800; color: #60a5fa; }
 
-/* بحث */
 .controls { display: flex; gap: .75rem; flex-wrap: wrap; }
 .controls input, .controls select {
   padding: .65rem 1rem;
@@ -229,7 +228,6 @@ body {
 .controls input:focus, .controls select:focus { border-color: #60a5fa; }
 .controls select option { background: #1e293b; }
 
-/* جدول */
 .table-wrap { background: #1e293b; border: 1px solid #334155; border-radius: 14px; overflow: hidden; }
 table { width: 100%; border-collapse: collapse; font-size: .93rem; }
 th {
@@ -241,14 +239,13 @@ td { padding: .8rem 1rem; border-bottom: 1px solid #1e293b; color: #e2e8f0; }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover td { background: #ffffff08; }
 
-/* شارات التقدير */
 .badge { display: inline-block; padding: .25rem .8rem; border-radius: 999px; font-size: .82rem; font-weight: 700; }
 .badge-a { background: #166534; color: #bbf7d0; }
 .badge-b { background: #1e3a5f; color: #93c5fd; }
-.badge-c { background: #78350f; color: #fde68a; }
+.badge-c { background: #854d0e; color: #fef08a; }
+.badge-d { background: #78350f; color: #fde68a; }
 .badge-f { background: #7f1d1d; color: #fca5a5; }
 
-/* أزرار إجراءات */
 .btn-edit {
   background: none; border: 1px solid #3b82f6; color: #60a5fa;
   padding: .25rem .7rem; border-radius: 6px; cursor: pointer;
@@ -264,7 +261,6 @@ tbody tr:hover td { background: #ffffff08; }
 }
 .btn-del:hover { background: #ef444420; }
 
-/* نموذج الإضافة */
 .add-section {
   background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 1.5rem;
 }
@@ -292,7 +288,37 @@ tbody tr:hover td { background: #ffffff08; }
 
 .empty-row td { text-align: center; padding: 2rem; color: #475569; }
 
-/* استجابة */
+/* ===== التعديلات الإضافية الجديدة ===== */
+.footer {
+  position: absolute; bottom: 20px; width: 100%;
+  text-align: center; color: #64748b; font-size: 0.95rem; z-index: 10;
+}
+.footer strong { color: #94a3b8; }
+
+.modal-overlay {
+  position: fixed; inset: 0; background: #0f172acc;
+  display: none; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.modal-overlay.active { display: flex; }
+
+.modal-card {
+  background: #1e293b; border: 1px solid #334155; border-radius: 16px;
+  padding: 2rem; width: 100%; max-width: 500px;
+  display: flex; flex-direction: column; gap: 1.2rem;
+}
+.modal-card h3 { color: #f1f5f9; font-size: 1.3rem; border-bottom: 1px solid #334155; padding-bottom: 0.8rem; margin-bottom: 0.5rem;}
+
+.modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 500px) { .modal-grid { grid-template-columns: 1fr; } }
+.modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; }
+
+.score-details {
+  font-size: 0.8rem; color: #94a3b8;
+  display: flex; gap: 0.5rem; margin-top: 0.3rem;
+}
+.score-details span { background: #0f172a; padding: 0.2rem 0.5rem; border-radius: 6px; }
+
 @media (max-width: 600px) {
   .home-title { font-size: 1.7rem; }
   .result-summary { grid-template-columns: 1fr; }

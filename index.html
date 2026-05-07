@@ -27,10 +27,19 @@
         <span class="role-label">دخول الطالب</span>
         <span class="role-desc">عرض نتيجتك</span>
       </button>
+      <button class="role-card" onclick="showScreen('screen-appeal')">
+        <span class="role-icon">📝</span>
+        <span class="role-label">تقديم الطعون</span>
+        <span class="role-desc">طلب مراجعة للنتيجة</span>
+      </button>
     </div>
   </div>
-</div>
-
+<div class="footer">
+  تم الإعداد بواسطة الطلبة:<br>
+  <strong>محمد ميلاد خليفة</strong><br>
+  <strong> ايمن عطية مصباح</strong><br>
+  <strong> عبدالرحمن صالح علي</strong>
+</div></div>
 <!-- ======= شاشة تسجيل دخول الأستاذ ======= -->
 <div id="screen-teacher-login" class="screen">
   <div class="login-wrap">
@@ -65,6 +74,31 @@
       </div>
       <p id="s-err" class="err-msg"></p>
       <button class="btn-primary" onclick="studentLogin()">عرض النتيجة</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= شاشة تقديم الطعون ======= -->
+<div id="screen-appeal" class="screen">
+  <div class="login-wrap">
+    <button class="back-btn" onclick="showScreen('screen-home')">→ رجوع</button>
+    <div class="login-card">
+      <div class="login-icon">⚖️</div>
+      <h2>تقديم طعن</h2>
+      <div class="field-group">
+        <label>رقم القيد</label>
+        <input type="text" id="a-id" placeholder="أدخل رقم القيد الخاص بك"/>
+      </div>
+      <div class="field-group">
+        <label>المادة</label>
+        <input type="text" id="a-subject" placeholder="اسم المادة المطعون فيها"/>
+      </div>
+      <div class="field-group">
+        <label>سبب الطعن</label>
+        <textarea id="a-reason" placeholder="اكتب سبب طلب المراجعة..." style="background:#0f172a; border:1.5px solid #334155; border-radius:10px; color:#f1f5f9; padding:1rem; font-family:'Tajawal'; min-height:80px;"></textarea>
+      </div>
+      <p id="a-msg" class="form-msg"></p>
+      <button class="btn-primary" onclick="submitAppeal()">إرسال الطعن</button>
     </div>
   </div>
 </div>
@@ -110,30 +144,31 @@
       <button class="btn-logout" onclick="logout()">تسجيل خروج</button>
     </header>
 
-    <!-- إحصائيات -->
     <div class="stats-grid" id="stats"></div>
 
-    <!-- بحث وفلترة -->
     <div class="controls">
-      <input type="text" id="search" placeholder="🔍 ابحث بالاسم أو رقم القيد..." oninput="renderTable()"/>
-      <select id="filterGrade" onchange="renderTable()">
+      <input type="text" id="search" placeholder="🔍 ابحث بالاسم أو رقم القيد..." oninput="filterTable()"/>
+      <select id="filterGrade" onchange="filterTable()">
         <option value="">جميع التقديرات</option>
         <option value="A">ممتاز (A)</option>
         <option value="B">جيد جداً (B)</option>
         <option value="C">جيد (C)</option>
+        <option value="D">مقبول (D)</option>
         <option value="F">راسب (F)</option>
       </select>
     </div>
 
-    <!-- جدول النتائج -->
-    <div class="table-wrap">
+    <div class="table-wrap" style="overflow-x: auto;">
       <table>
         <thead>
           <tr>
             <th>رقم القيد</th>
-            <th>اسم الطالب</th>
+            <th>الاسم</th>
             <th>المادة</th>
-            <th>الدرجة</th>
+            <th>أ. السنة</th>
+            <th>النصفي</th>
+            <th>النهائي</th>
+            <th>المجموع</th>
             <th>التقدير</th>
             <th>إجراءات</th>
           </tr>
@@ -142,19 +177,60 @@
       </table>
     </div>
 
-    <!-- إضافة طالب -->
     <div class="add-section">
       <h3>➕ إضافة نتيجة طالب</h3>
       <div class="form-row">
-        <input type="text"   id="nId"      placeholder="رقم القيد"/>
-        <input type="text"   id="nName"    placeholder="اسم الطالب"/>
-        <input type="text"   id="nSubject" placeholder="المادة"/>
-        <input type="number" id="nScore"   placeholder="الدرجة (0-100)" min="0" max="100"/>
-        <button class="btn-add" onclick="addStudent()">إضافة</button>
+        <input type="text" id="nId" placeholder="رقم القيد"/>
+        <input type="text" id="nName" placeholder="اسم الطالب"/>
+        <input type="text" id="nSubject" placeholder="المادة"/>
+      </div>
+      <div class="form-row" style="margin-top: 10px;">
+        <input type="number" id="nCw" placeholder="أعمال السنة" min="0"/>
+        <input type="number" id="nMid" placeholder="النصفي" min="0"/>
+        <input type="number" id="nFin" placeholder="النهائي" min="0"/>
+        <button class="btn-add" onclick="addStudent()">إضافة وحساب المجموع</button>
       </div>
       <p id="formMsg" class="form-msg"></p>
     </div>
 
+  </div>
+</div>
+
+<!-- ======= نافذة تعديل البيانات (Modal) ======= -->
+<div id="editModal" class="modal-overlay">
+  <div class="modal-card">
+    <h3>تعديل بيانات النتيجة</h3>
+    <input type="hidden" id="eDocId"/>
+    <div class="modal-grid">
+      <div class="field-group">
+        <label>رقم القيد</label>
+        <input type="text" id="eId"/>
+      </div>
+      <div class="field-group">
+        <label>اسم الطالب</label>
+        <input type="text" id="eName"/>
+      </div>
+      <div class="field-group">
+        <label>المادة</label>
+        <input type="text" id="eSubject"/>
+      </div>
+      <div class="field-group">
+        <label>أعمال السنة</label>
+        <input type="number" id="eCw"/>
+      </div>
+      <div class="field-group">
+        <label>النصفي</label>
+        <input type="number" id="eMid"/>
+      </div>
+      <div class="field-group">
+        <label>النهائي</label>
+        <input type="number" id="eFin"/>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" style="width:auto; padding:0.5rem 1rem;" onclick="saveEdit()">حفظ التعديلات</button>
+      <button class="btn-logout" style="border:1px solid #64748b; color:#94a3b8;" onclick="closeEditModal()">إلغاء</button>
+    </div>
   </div>
 </div>
 
