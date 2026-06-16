@@ -152,9 +152,50 @@ async function addStudent() {
   const cw = parseInt(document.getElementById("nCw").value) || 0;
   const mid = parseInt(document.getElementById("nMid").value) || 0;
   const fin = parseInt(document.getElementById("nFin").value) || 0;
-  if (!id || !name || !sub) return;
-  await addDoc(studentsCol, { id, name, subject: sub, coursework: cw, midterm: mid, final: fin, score: cw+mid+fin });
-  await reloadTable();
+  
+  const msg = document.getElementById("formMsg");
+
+  // 1. التحقق من عدم ترك الحقول فارغة
+  if (!id || !name || !sub) {
+    msg.textContent = "⚠️ يرجى ملء الحقول الأساسية (رقم القيد، الاسم، المادة).";
+    msg.className = "form-msg error";
+    return;
+  }
+
+  // 2. التحقق من التكرار (نفس الطالب في نفس المادة)
+  const isDuplicate = globalStudents.some(s => 
+    (s.id === id || s.name === name) && s.subject === sub
+  );
+  
+  if (isDuplicate) {
+    msg.textContent = "⚠️ عذراً، هذا الطالب يمتلك نتيجة مسجلة مسبقاً في هذه المادة!";
+    msg.className = "form-msg error";
+    return;
+  }
+
+  // 3. إظهار رسالة تحميل أثناء الإضافة
+  msg.textContent = "⏳ جاري الإضافة...";
+  msg.className = "form-msg";
+
+  try {
+    await addDoc(studentsCol, { id, name, subject: sub, coursework: cw, midterm: mid, final: fin, score: cw+mid+fin });
+    
+    // تفريغ الحقول بعد نجاح الإضافة (بإمكانك إبقاء الاسم ورقم القيد إذا أردت تسهيل إدخال مادة أخرى لنفس الطالب)
+    document.getElementById("nSubject").value = "";
+    document.getElementById("nCw").value = "";
+    document.getElementById("nMid").value = "";
+    document.getElementById("nFin").value = "";
+
+    msg.textContent = "✅ تمت الإضافة بنجاح.";
+    msg.className = "form-msg success";
+    
+    await reloadTable();
+    
+    setTimeout(() => { msg.textContent = ""; }, 3000);
+  } catch(e) {
+    msg.textContent = "⚠️ حدث خطأ أثناء الإضافة. تأكد من الاتصال بالإنترنت.";
+    msg.className = "form-msg error";
+  }
 }
 
 window.openEditModal = function(docId) {
@@ -182,6 +223,95 @@ window.saveEdit = async () => {
   });
   closeEditModal(); await reloadTable();
 }
+// دالة استيراد البيانات من إكسل
+async function importFromExcel() {
+  const fileInput = document.getElementById("excelFile");
+  const msg = document.getElementById("excelMsg");
+
+  if (!fileInput.files.length) {
+    msg.textContent = "⚠️ يرجى اختيار ملف إكسل أولاً.";
+    msg.className = "form-msg error";
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+
+  msg.textContent = "⏳ جاري قراءة الملف...";
+  msg.className = "form-msg";
+
+  reader.onload = async function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      
+      // نأخذ الورقة الأولى من ملف الإكسل
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      
+      // تحويل البيانات إلى مصفوفة (JSON)
+      const json = XLSX.utils.sheet_to_json(worksheet);
+
+      if (json.length === 0) {
+        msg.textContent = "⚠️ الملف فارغ أو لا يحتوي على بيانات.";
+        msg.className = "form-msg error";
+        return;
+      }
+
+      msg.textContent = "⏳ جاري رفع وحفظ البيانات في القاعدة...";
+
+      let addedCount = 0;
+      let duplicateCount = 0;
+
+      // حلقة تكرارية للمرور على كل صف في الإكسل
+      for (const row of json) {
+        // سيبحث الكود عن أسماء الأعمدة بالعربية كما هي في الإكسل
+        const id = String(row["رقم القيد"] || "").trim();
+        const name = String(row["الاسم"] || "").trim();
+        const sub = String(row["المادة"] || "").trim();
+        const cw = parseInt(row["أعمال السنة"]) || 0;
+        const mid = parseInt(row["النصفي"]) || 0;
+        const fin = parseInt(row["النهائي"]) || 0;
+
+        // تجاهل الصفوف التي لا تحتوي على البيانات الأساسية
+        if (!id || !name || !sub) continue;
+
+        // التحقق من التكرار (لتجنب رفع نفس النتيجة مرتين)
+        const isDuplicate = globalStudents.some(s => 
+          (s.id === id || s.name === name) && s.subject === sub
+        );
+
+        if (!isDuplicate) {
+          await addDoc(studentsCol, { 
+            id, name, subject: sub, 
+            coursework: cw, midterm: mid, final: fin, 
+            score: cw + mid + fin 
+          });
+          addedCount++;
+        } else {
+          duplicateCount++;
+        }
+      }
+
+      msg.textContent = `✅ اكتملت العملية: تم إضافة ${addedCount} نتيجة. (تجاهل ${duplicateCount} مكررة)`;
+      msg.className = "form-msg success";
+      
+      // تفريغ حقل الملف وتحديث الجدول
+      fileInput.value = "";
+      await reloadTable();
+      
+      setTimeout(() => { msg.textContent = ""; }, 6000);
+
+    } catch (err) {
+      console.error(err);
+      msg.textContent = "⚠️ حدث خطأ أثناء قراءة الملف. تأكد من أنه ملف إكسل صالح.";
+      msg.className = "form-msg error";
+    }
+  };
+
+  // تشغيل قارئ الملفات
+  reader.readAsArrayBuffer(file);
+}
 
 async function deleteStudent(docId) { if(confirm("حذف؟")) { await deleteDoc(doc(db, "students", docId)); await reloadTable(); } }
 
@@ -193,3 +323,4 @@ window.deleteStudent = deleteStudent;
 window.addStudent = addStudent;
 window.logout = () => showScreen("screen-home");
 document.addEventListener("DOMContentLoaded", () => showScreen("screen-home"));
+window.importFromExcel = importFromExcel;

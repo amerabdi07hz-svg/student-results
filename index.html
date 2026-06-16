@@ -6,6 +6,7 @@
   <title>بوابة النتائج</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -194,6 +195,16 @@
     </div>
 
   </div>
+  <div class="add-section" style="margin-top: 15px;">
+  <h3>📁 استيراد النتائج من ملف إكسل</h3>
+  <div class="form-row">
+    <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="padding: 0.4rem;"/>
+    <button class="btn-add" onclick="importFromExcel()" style="background: #2563eb;">رفع واستيراد</button>
+  </div>
+  <p id="excelMsg" class="form-msg"></p>
+  <p style="font-size: 0.8rem; color: #64748b; margin-top: 5px;">* يجب أن يحتوي الملف على الأعمدة التالية: رقم القيد، الاسم، المادة، أعمال السنة، النصفي، النهائي.</p>
+</div>
+
 </div>
 
 <!-- ======= نافذة تعديل البيانات (Modal) ======= -->
