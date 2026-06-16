@@ -1,4 +1,21 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+// دالة لتوحيد النصوص والأرقام العربية والإنجليزية لتسهيل المقارنة
+function normalizeInput(text) {
+  if (!text) return "";
+  return text.toString()
+    // 1. تحويل الأرقام العربية/الهندية إلى إنجليزية
+    .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
+    // 2. إزالة التشكيل (إن وُجد)
+    .replace(/[\u064B-\u065F]/g, "")
+    // 3. توحيد أشكال حرف الألف
+    .replace(/[أإآ]/g, "ا")
+    // 4. توحيد التاء المربوطة والهاء
+    .replace(/ة/g, "ه")
+    // 5. توحيد الياء والألف المقصورة
+    .replace(/ى/g, "ي")
+    .toLowerCase()
+    .trim();
+}import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -113,6 +130,10 @@ async function submitAppeal() {
 async function reloadTable() {
   const snapshot = await getDocs(studentsCol);
   globalStudents = snapshot.docs.map(d => ({ docId: d.id, ...d.data() }));
+  
+  // ترتيب الطلاب تصاعدياً حسب رقم القيد (مع مراعاة الترتيب الرقمي الصحيح)
+  globalStudents.sort((a, b) => String(a.id).localeCompare(String(b.id), undefined, { numeric: true }));
+  
   renderStats(globalStudents);
   window.filterTable();
 }
@@ -163,9 +184,24 @@ async function addStudent() {
   }
 
   // 2. التحقق من التكرار (نفس الطالب في نفس المادة)
-  const isDuplicate = globalStudents.some(s => 
-    (s.id === id || s.name === name) && s.subject === sub
-  );
+  // 2. التحقق من التكرار (نفس الطالب في نفس المادة) مع توحيد النصوص
+  const normId = normalizeInput(id);
+  const normName = normalizeInput(name);
+  const normSub = normalizeInput(sub);
+
+  const isDuplicate = globalStudents.some(s => {
+    const sId = normalizeInput(s.id);
+    const sName = normalizeInput(s.name);
+    const sSub = normalizeInput(s.subject);
+
+    return (sId === normId || sName === normName) && sSub === normSub;
+  });
+  
+  if (isDuplicate) {
+    msg.textContent = "⚠️ عذراً، هذا الطالب يمتلك نتيجة مسجلة مسبقاً في هذه المادة!";
+    msg.className = "form-msg error";
+    return;
+  }
   
   if (isDuplicate) {
     msg.textContent = "⚠️ عذراً، هذا الطالب يمتلك نتيجة مسجلة مسبقاً في هذه المادة!";
