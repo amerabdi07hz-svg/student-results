@@ -119,14 +119,51 @@ async function submitAppeal() {
   const sub = document.getElementById("a-subject").value.trim();
   const rea = document.getElementById("a-reason").value.trim();
   const msg = document.getElementById("a-msg");
-  if(!id || !sub || !rea) { msg.textContent = "⚠️ املأ الحقول."; return; }
-  try {
-    await addDoc(appealsCol, { studentId: id, subject: sub, reason: rea, date: new Date().toISOString() });
-    msg.textContent = "✅ تم الإرسال.";
-    setTimeout(() => showScreen("screen-home"), 2000);
-  } catch(e) { msg.textContent = "⚠️ فشل الإرسال."; }
-}
+  
+  // 1. التحقق من ملء الحقول الأساسية
+  if(!id || !sub || !rea) { 
+    msg.textContent = "⚠️ يرجى ملء كافة الحقول."; 
+    msg.className = "form-msg error";
+    return; 
+  }
+  
+  msg.textContent = "⏳ جاري التحقق والإرسال...";
+  msg.className = "form-msg";
 
+  try {
+    // 2. التحقق من وجود رقم القيد في قاعدة بيانات الطلاب
+    const q = query(studentsCol, where("id", "==", id));
+    const snapshot = await getDocs(q);
+    
+    if (snapshot.empty) { 
+      // إذا لم يتم العثور على أي طالب يحمل رقم القيد المدخل
+      msg.textContent = "⚠️ رقم القيد غير مدرج في المنظومة."; 
+      msg.className = "form-msg error";
+      return; 
+    }
+
+    // 3. إرسال الطعن في حال كان رقم القيد صحيحاً وموجوداً
+    await addDoc(appealsCol, { 
+      studentId: id, 
+      subject: sub, 
+      reason: rea, 
+      date: new Date().toISOString() 
+    });
+    
+    msg.textContent = "✅ تم إرسال الطعن بنجاح.";
+    msg.className = "form-msg success";
+    
+    // إفراغ الحقول والعودة للشاشة الرئيسية
+    document.getElementById("a-id").value = "";
+    document.getElementById("a-subject").value = "";
+    document.getElementById("a-reason").value = "";
+    setTimeout(() => showScreen("screen-home"), 2000);
+    
+  } catch(e) { 
+    msg.textContent = "⚠️ فشل الإرسال، تحقق من الاتصال بالإنترنت."; 
+    msg.className = "form-msg error";
+  }
+}
 async function reloadTable() {
   const snapshot = await getDocs(studentsCol);
   globalStudents = snapshot.docs.map(d => ({ docId: d.id, ...d.data() }));
