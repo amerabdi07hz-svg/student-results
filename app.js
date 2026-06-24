@@ -120,7 +120,6 @@ async function submitAppeal() {
   const rea = document.getElementById("a-reason").value.trim();
   const msg = document.getElementById("a-msg");
   
-  // 1. التحقق من ملء الحقول الأساسية
   if(!id || !sub || !rea) { 
     msg.textContent = "⚠️ يرجى ملء كافة الحقول."; 
     msg.className = "form-msg error";
@@ -131,21 +130,44 @@ async function submitAppeal() {
   msg.className = "form-msg";
 
   try {
-    // 2. التحقق من وجود رقم القيد في قاعدة بيانات الطلاب
+    // 1. جلب جميع نتائج الطالب بواسطة رقم القيد
     const q = query(studentsCol, where("id", "==", id));
     const snapshot = await getDocs(q);
     
     if (snapshot.empty) { 
-      // إذا لم يتم العثور على أي طالب يحمل رقم القيد المدخل
       msg.textContent = "⚠️ رقم القيد غير مدرج في المنظومة."; 
       msg.className = "form-msg error";
       return; 
     }
 
-    // 3. إرسال الطعن في حال كان رقم القيد صحيحاً وموجوداً
+    // استخراج بيانات الطالب من قاعدة البيانات
+    const studentRecords = snapshot.docs.map(doc => doc.data());
+
+    // توحيد اسم المادة المدخلة باستخدام دالتك لتسهيل المقارنة (تجاهل الهمزات والمسافات)
+    const normInputSub = normalizeInput(sub);
+
+    // 2. البحث عن المادة المحددة ضمن نتائج الطالب
+    const targetRecord = studentRecords.find(record => 
+      normalizeInput(record.subject) === normInputSub
+    );
+
+    if (!targetRecord) {
+      msg.textContent = "⚠️ عذراً، لم يتم العثور على نتيجة لك في هذه المادة.";
+      msg.className = "form-msg error";
+      return;
+    }
+
+    // 3. التحقق من حالة النجاح (الدرجة 50 فما فوق)
+    if (targetRecord.score >= 50) {
+      msg.textContent = "⚠️ عذراً، لا يمكنك تقديم طعن لأنك ناجح في هذه المادة بالفعل.";
+      msg.className = "form-msg error";
+      return;
+    }
+
+    // 4. إذا اجتاز الطالب كل الشروط (رقم القيد موجود + المادة موجودة + راسب فيها)، يتم إرسال الطعن
     await addDoc(appealsCol, { 
       studentId: id, 
-      subject: sub, 
+      subject: targetRecord.subject, // نستخدم الاسم الأصلي للمادة من القاعدة ليكون دقيقاً
       reason: rea, 
       date: new Date().toISOString() 
     });
@@ -153,7 +175,7 @@ async function submitAppeal() {
     msg.textContent = "✅ تم إرسال الطعن بنجاح.";
     msg.className = "form-msg success";
     
-    // إفراغ الحقول والعودة للشاشة الرئيسية
+    // إفراغ الحقول
     document.getElementById("a-id").value = "";
     document.getElementById("a-subject").value = "";
     document.getElementById("a-reason").value = "";
